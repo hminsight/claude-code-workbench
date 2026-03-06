@@ -6,10 +6,35 @@
 WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 echo "=== Workspace: ${WORKSPACE_DIR} ==="
 
+# --- Volume ownership ---
+# Docker volumes for Claude Code may be created as root. Ensure the vscode user owns them in the container.
+sudo chown -R "$(id -u):$(id -g)" "$HOME/.claude" /commandhistory 2>/dev/null || true
+
+# --- Persistent bash history ---
+# Ensure the history file exists on the volume and wire it into the shell profile.
+touch /commandhistory/.bash_history
+HISTORY_SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history"
+if ! grep -q "/commandhistory/.bash_history" "$HOME/.bashrc" 2>/dev/null; then
+  echo "$HISTORY_SNIPPET" >> "$HOME/.bashrc"
+fi
+
+# --- Claude Code settings ---
+# The ~/.claude volume mount shadows the repo's .claude/ directory, so copy repo-level settings
+# into the volume on first use (skip if already present so user customisations aren't overwritten).
+if [ -f "${WORKSPACE_DIR}/.claude/settings.json" ] && [ ! -f "$HOME/.claude/settings.json" ]; then
+  cp "${WORKSPACE_DIR}/.claude/settings.json" "$HOME/.claude/settings.json"
+fi
+
 # --- Claude Code ---
 echo "=== Installing Claude Code ==="
 if ! command -v claude &> /dev/null; then
-  curl -fsSL https://claude.ai/install.sh | bash || echo "WARN: Claude Code install failed — install manually later"
+  # Retry up to 5 times with a 10s delay between attempts (handles transient failures e.g. 429 rate limits).
+  installed=false
+  for _attempt in 1 2 3 4 5; do
+    (set -o pipefail; curl -fsSL https://claude.ai/install.sh | bash) && installed=true && break
+    [ "$_attempt" -lt 5 ] && echo "Install attempt ${_attempt} failed — retrying in 10s..." && sleep 10
+  done
+  $installed || echo "WARN: Claude Code install failed after 5 attempts — install manually later"
   # Ensure claude is on PATH for the rest of this script
   export PATH="$HOME/.claude/bin:$HOME/.local/bin:$PATH"
 fi
@@ -29,14 +54,6 @@ if command -v npx &> /dev/null; then
   npx --yes bmad-method install --directory "${WORKSPACE_DIR}" --modules bmm --tools claude-code --yes 2>&1 | tail -20 || echo "WARN: BMAD install failed — run 'npx bmad-method install' manually"
 else
   echo "WARN: npx not found — skipping BMAD install. Install Node.js first, then run 'npx bmad-method install'"
-fi
-
-# --- Claude Code plugins ---
-echo "=== Installing Claude Code plugins ==="
-if command -v claude &> /dev/null; then
-  claude plugin install frontend-design@claude-plugins-official --scope project 2>/dev/null || echo "WARN: Plugin install failed — run '/plugin install frontend-design' inside Claude Code"
-else
-  echo "WARN: claude not on PATH — skipping plugin install"
 fi
 
 # --- Azure CLI (optional, install if needed) ---

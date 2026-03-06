@@ -160,8 +160,16 @@ All available as `/bmad-*` slash commands inside Claude Code.
 | "Reopen in Container" not showing | Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) in VS Code |
 | Docker not running on Windows | Open Docker Desktop and ensure WSL 2 integration is enabled in Settings > Resources |
 | Container build fails | Check Docker has enough resources: Settings > Resources > increase memory to 4GB+ |
-| `claude` command not found | Run `curl -fsSL https://claude.ai/install.sh \| bash` inside the container |
+| `claude` command not found | See [Claude not found on Insight devices](#claude-not-found-on-insight-devices) below |
 | BMAD not installed | Run `npx --yes bmad-method install --modules bmm --tools claude-code --yes` inside the container |
+
+### Claude not found on Insight devices
+
+SSL inspection and/or [Defender for Endpoint web content filtering](https://learn.microsoft.com/en-us/defender-endpoint/web-content-filtering) may be blocking `claude.ai`/`claude.com` on Insight-managed devices.
+
+1. Disconnect from the corporate network (use guest Wi-Fi in the office, or disconnect from VPN if WFH).
+2. Open [https://claude.com](https://claude.com) and click **Allow** if blocked; repeat for [https://claude.ai](https://claude.ai).
+3. Run `Dev Containers: Rebuild Container` from the command palette (`Ctrl+Shift+P`).
 
 ## License
 

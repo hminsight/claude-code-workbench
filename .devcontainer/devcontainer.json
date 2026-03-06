@@ -22,6 +22,10 @@
       }
     }
   },
+  "mounts": [
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume",
+    "source=claude-code-bashhistory-${devcontainerId},target=/commandhistory,type=volume"
+  ],
   "forwardPorts": [],
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteUser": "vscode"
