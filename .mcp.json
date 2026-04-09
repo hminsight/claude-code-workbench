@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "slideshow": {
+      "type": "http",
+      "url": "https://ca-slideshow-staging-aue.bravedesert-03aa4141.australiaeast.azurecontainerapps.io/api/mcp"
+    }
+  }
+}

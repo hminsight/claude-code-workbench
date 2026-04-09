@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@insight-services-apac/slidev-addon-insight-ai": "^0.2.5",
+    "@insight-services-apac/slidev-addon-insight-pptx": "^0.2.5",
+    "@insight-services-apac/slidev-theme-insight": "^0.4.0"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.14.2",
+    "@slidev/theme-default": "^0.25.0"
+  }
+}
