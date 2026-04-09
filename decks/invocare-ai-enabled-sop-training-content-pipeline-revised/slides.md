@@ -42,7 +42,7 @@ class: text-left
 
   <div class="a5" style="font-size:0.75rem;opacity:0.4;line-height:2;letter-spacing:0.02em">
     March 2026<br/>
-    Trent Cain &middot; Niamh Toohey &middot; Steve White &middot; Graham Elliott &middot; Aparna Sundararajan
+    Graham Elliott &middot; Niamh Toohey &middot; Steve White
   </div>
 </div>
 
